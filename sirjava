@@ -1,0 +1,73 @@
+#!/bin/bash
+
+checkCat(){
+  ps cax | grep jsvc > /dev/null
+  if [[ $? -eq 0 ]];
+  then 
+    echo "tomcat is running"
+  else
+    echo "tomacat is inactive"
+  fi
+}
+
+checkApache(){
+  ps cax | grep httpd > /dev/null
+  if [[ $? -eq 0 ]];
+  then
+    echo "apache is running"
+  else
+    echo "apache is inactive"
+  fi
+}
+
+checkSql(){
+  ps cax | grep mysql > /dev/null
+  if [[ $? -eq 0 ]];
+  then 
+    echo "my sql is running"
+  else 
+    echo "my sql is inactive"
+  fi
+}
+
+if [ "$1" == "start" ];
+then
+  
+  echo "starting apache..."
+  sudo systemctl start httpd
+  apacheconf=$(systemctl status httpd | grep running)
+
+  echo "starting my sql...."
+  sudo systemctl start mysqld
+  mysqlconf=$(systemctl status mysqld | grep running)
+  
+  echo "starting tomcat....."
+  sudo systemctl start tomcat7
+  tomcatconf=$(systemctl status tomcat7 | grep running)  
+
+  checkCat
+  checkApache
+  checkSql
+
+elif [ "$1" == "stop" ];
+then
+  echo "closing apache"
+  sudo systemctl stop httpd
+  
+  echo "closing mysql"
+  sudo systemctl stop mysqld
+
+  echo "closing tomcat"
+  sudo systemctl stop tomcat7
+
+  checkApache
+  checkSql
+  checkCat
+
+elif [ "$1" == "status" ];
+then
+  checkCat 
+  checkApache
+  checkSql
+fi
+
